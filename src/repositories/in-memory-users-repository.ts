@@ -2,6 +2,7 @@ import { UserRepository } from '@/repositories/users.repository';
 import { Prisma, User } from '@prisma/client';
 
 export class InMemoryUserRepository implements UserRepository {
+
     public users: User[] = [];
 
     create(data: Prisma.UserCreateInput): Promise<User> {
@@ -18,6 +19,16 @@ export class InMemoryUserRepository implements UserRepository {
     }
     findByEmail(email: string): Promise<User | null> {
         const user = this.users.find(user => user.email === email);
+
+        if (!user) {
+            return new Promise(resolve => resolve(null));
+        }
+
+        return new Promise(resolve => resolve(user));
+    }
+
+    findbyId(id: string): Promise<User | null> {
+        const user = this.users.find(user => user.id === id);
 
         if (!user) {
             return new Promise(resolve => resolve(null));

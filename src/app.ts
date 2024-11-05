@@ -3,6 +3,7 @@ import { appRoutes } from "./http/routes";
 import { ZodError } from "zod";
 import { env } from "./env";
 import { UserAlreadExistError } from "./errors/user-already-exists";
+import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
 
 export const app = fastify();
 
@@ -14,6 +15,10 @@ app.setErrorHandler((error, _, reply) => {
             message: 'Validation error.',
             issues: error.format()
         })
+    }
+
+    if (error instanceof InvalidCredentialsError) {
+        return reply.status(400).send({ message: error.message })
     }
 
     if (error instanceof UserAlreadExistError) {

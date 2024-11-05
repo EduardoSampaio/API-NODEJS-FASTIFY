@@ -1,18 +1,22 @@
 import { InMemoryUserRepository } from '@/repositories/in-memory-users-repository';
 import { compare } from 'bcryptjs'
-import { expect, describe, it } from 'vitest'
+import { expect, describe, it, beforeEach } from 'vitest'
 import { RegisterUseCase } from './register.usecase';
 import { UserAlreadExistError } from '@/errors/user-already-exists';
 
 
 describe('Register Use Case', () => {
 
+    let repository: InMemoryUserRepository;
+    let sut: RegisterUseCase;
+
+    beforeEach(() => {
+        repository = new InMemoryUserRepository();
+        sut = new RegisterUseCase(repository)
+    })
+
     it('should be able to register', async () => {
-
-        const repository = new InMemoryUserRepository();
-        const registerUserCase = new RegisterUseCase(repository)
-
-        const user = await registerUserCase.execute({
+        const user = await sut.execute({
             name: 'John Doe',
             email: 'KX7Jt@example.com',
             password: '123456'
@@ -23,11 +27,7 @@ describe('Register Use Case', () => {
 
 
     it('should hash user password up registration', async () => {
-
-        const repository = new InMemoryUserRepository();
-        const registerUserCase = new RegisterUseCase(repository)
-
-        const user = await registerUserCase.execute({
+        const user = await sut.execute({
             name: 'John Doe',
             email: 'KX7Jt@example.com',
             password: '123456'
@@ -39,18 +39,15 @@ describe('Register Use Case', () => {
 
     it('should not be able to register with same email', async () => {
 
-        const repository = new InMemoryUserRepository();
-        const registerUserCase = new RegisterUseCase(repository)
-
         const email = 'KX7Jt@example.com'
-        await registerUserCase.execute({
+        await sut.execute({
             name: 'John Doe',
             email,
             password: '123456'
         })
 
         await expect(() =>
-            registerUserCase.execute({
+            sut.execute({
                 name: 'John Doe',
                 email,
                 password: '123456'
