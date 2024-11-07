@@ -1,6 +1,6 @@
 import { Prisma, User } from '@prisma/client';
 import { prisma } from "@/lib/prisma"
-import { UserRepository } from './users.repository';
+import { UserRepository } from '../intefaces/users.repository';
 
 export class PrismaUserRepository implements UserRepository {
     findbyId(id: string): Promise<User | null> {
