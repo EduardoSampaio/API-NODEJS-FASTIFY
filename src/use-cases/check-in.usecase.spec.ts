@@ -3,6 +3,8 @@ import { expect, describe, it, beforeEach, vi, afterEach } from 'vitest'
 import { CheckInUseCase } from './checkin.usecase';
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gym-repository';
 import { Decimal } from '@prisma/client/runtime/library';
+import { MaxDistanceError } from '@/errors/max-distance-error';
+import { MaxNumberOfCheckInsError } from '@/errors/max-number-of-check-ins-error';
 
 describe('Check-in Use Case', () => {
 
@@ -32,7 +34,7 @@ describe('Check-in Use Case', () => {
         vi.useRealTimers();
     })
 
-    it('should be able to check in', async () => {
+    it('should be able to create check in', async () => {
         const { checkIn } = await sut.execute({
             gymId: 'gym-01',
             userId: 'user-01',
@@ -60,7 +62,7 @@ describe('Check-in Use Case', () => {
             userId: 'user-01',
             userLatitude: 0,
             userLongitude: 0,
-        })).rejects.toBeInstanceOf(Error)
+        })).rejects.toBeInstanceOf(MaxNumberOfCheckInsError)
     })
 
 
@@ -84,6 +86,25 @@ describe('Check-in Use Case', () => {
         })
 
         expect(checkIn.id).toEqual(expect.any(String))
+    })
+
+
+    it('should not be able to create check in on distant gym', async () => {
+        gymRepository.gyms.push({
+            id: 'gym-02',
+            title: 'JavaScript Gym',
+            description: '',
+            latitude: new Decimal(-27.0747279),
+            longitude: new Decimal(-49.4889672),
+            phone: null
+        })
+
+        await expect(() => sut.execute({
+            gymId: 'gym-02',
+            userId: 'user-01',
+            userLatitude: -27.2092052,
+            userLongitude: -49.6401091,
+        })).rejects.toBeInstanceOf(MaxDistanceError)
     })
 
 })
