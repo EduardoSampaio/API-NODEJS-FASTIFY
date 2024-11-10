@@ -1,10 +1,8 @@
-import { InMemoryCheckInRepository } from '@/repositories/in-memory/in-memory-checkin-repository';
 import { expect, describe, it, beforeEach } from 'vitest'
-import { FechUserCheckInsHistoryUseCase } from './fetch-user-check-ins-history.usecase';
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gym-repository';
 import { SearchGymsUseCase } from './search-gyms.usecase';
 
-describe('Fetch Check-in History Use Case', () => {
+describe('Should be able to search gyms', () => {
 
     let repository: InMemoryGymsRepository;
     let sut: SearchGymsUseCase;
@@ -15,21 +13,30 @@ describe('Fetch Check-in History Use Case', () => {
 
     })
 
-    it('should be able to fetch pagined check-in history', async () => {
+    it('should be able to search gyms by query', async () => {
+        await repository.create({ title: 'JavaScript Gym', description: '', phone: null, latitude: -27.2092052, longitude: -49.6401091 });
+        await repository.create({ title: 'TypeScript Gym', description: '', phone: null, latitude: -27.2092052, longitude: -49.6401091 });
 
-        // for (let i = 1; i <= 22; i++) {
-        //     await repository.create({
-        //         gym_id: `gym-${i}`,
-        //         user_id: 'user-01'
-        //     });
-        // }
+        const { gyms } = await sut.execute({ query: 'JavaScript', page: 1 });
+
+        expect(gyms).toHaveLength(1);
+        expect(gyms).toEqual([expect.objectContaining({ title: 'JavaScript Gym' })])
+    })
 
 
-        // const { checkIns } = await sut.execute({
-        //     userId: 'user-01',
-        //     page: 1
-        // })
+    it('should be able to search paginated gyms', async () => {
 
-        expect(checkIns).toHaveLength(20);
+        for (let i = 1; i <= 22; i++) {
+            await repository.create({ title: `JavaScript Gym ${i}`, description: '', phone: null, latitude: -27.2092052, longitude: -49.6401091 });
+        }
+
+
+        const { gyms } = await sut.execute({ query: 'JavaScript', page: 2 });
+
+        expect(gyms).toHaveLength(2);
+        expect(gyms).toEqual([
+            expect.objectContaining({ title: 'JavaScript Gym 21' }),
+            expect.objectContaining({ title: 'JavaScript Gym 22' })
+        ])
     })
 })
