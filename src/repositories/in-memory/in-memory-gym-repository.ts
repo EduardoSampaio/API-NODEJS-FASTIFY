@@ -3,7 +3,6 @@ import { GymsRepository } from '../intefaces/gym-repository';
 import { randomUUID } from 'crypto';
 
 export class InMemoryGymsRepository implements GymsRepository {
-
     public gyms: Gym[] = [];
 
     async findbyId(id: string): Promise<Gym | null> {
@@ -28,5 +27,10 @@ export class InMemoryGymsRepository implements GymsRepository {
         this.gyms.push(gym);
 
         return gym;
+    }
+
+    async searchMany(query: string, page: number) {
+        return this.gyms.filter(gym => gym.title.includes(query))
+            .slice((page - 1) * 20, page * 20);
     }
 }
