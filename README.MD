@@ -1,3 +1,5 @@
+![example workflow](https://github.com/github/docs/actions/workflows/run-unit-test.yml/badge.svg)
+
 ## API Rest NodeJS:
 
 - Fastify
@@ -9,7 +11,8 @@
 - bcryptjs
 
 ### How to Run Application
--  Configure enviroment variable .env
+
+- Configure enviroment variable .env
 
 ```
 NODE_ENV=dev
@@ -18,24 +21,31 @@ DATABASE_URL=
 ```
 
 - Run Application Dev
+
 ```
 npm run start:dev
 ```
+
 - Run Application Production
+
 ```
 npm run start
 ```
 
 - Run Test
+
 ```
 npm run test
 ```
+
 - Generate Build
+
 ```
 npm run build
 ```
 
 - Run code coverage
+
 ```
 npm run test:coverage
 ```
