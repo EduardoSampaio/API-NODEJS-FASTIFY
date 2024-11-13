@@ -1,18 +1,32 @@
 import fastify from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import { appRoutes } from "./http/routes";
+
 import { ZodError } from "zod";
 import { env } from "./env";
 import { UserAlreadExistError } from "./errors/user-already-exists";
 import { InvalidCredentialsError } from "./errors/invalid-credentials-error";
+import { userRoutes } from "./http/controllers/users/user-routes";
+import { checkInsRoutes } from "./http/controllers/check-ins/routes";
+import fastifyCookie from "@fastify/cookie";
+import { gymsRoutes } from "./http/controllers/gyms/routes";
 
 export const app = fastify();
 
+app.register(fastifyCookie)
 app.register(fastifyJwt, {
-    secret: env.JWT_SECRET
+    secret: env.JWT_SECRET,
+    cookie: {
+        cookieName: 'refreshToken',
+        signed: false
+    },
+    sign: {
+        expiresIn: '10m'
+    }
 })
 
-app.register(appRoutes);
+app.register(userRoutes);
+app.register(gymsRoutes);
+app.register(checkInsRoutes);
 
 app.setErrorHandler((error, _, reply) => {
     if (error instanceof ZodError) {
