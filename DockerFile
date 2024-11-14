@@ -1,0 +1,11 @@
+FrFROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+COPY ./package*.json ./
+RUN npm install
+RUN npm run build
+COPY ./build ./app
+
+EXPOSE 3333
+CMD ["npm", "start"]
